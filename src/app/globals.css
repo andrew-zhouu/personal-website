@@ -1610,3 +1610,13 @@ button.crumb:hover {
   background: var(--accent);
   box-shadow: 0 0 8px var(--accent);
 }
+
+/* Phones: two facts per row; an odd last fact spans the row (no empty cell). */
+@media (max-width: 520px) {
+  .panel[data-mode="sheet"] .proof {
+    grid-template-columns: 1fr 1fr;
+  }
+  .panel[data-mode="sheet"] .proof-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}

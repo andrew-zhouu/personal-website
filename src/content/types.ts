@@ -118,7 +118,7 @@ export interface Star {
   highlights?: string[];
   /** What Andrew specifically did. Empty → section omitted. */
   contributions: string[];
-  /** Small key/value facts, e.g. { label: "Beta", value: "1,000+ simplifications" }. */
+  /** Small key/value facts, e.g. { label: "Reach", value: "1,000+ users" }. */
   proof?: { label: string; value: string }[];
   /** Outcomes and recognition. Empty → section omitted. */
   results: string[];

@@ -28,7 +28,7 @@ export const stars: Star[] = [
     layout: "product",
     tagline: "Making complicated information understandable.",
     summary:
-      "An AI-powered web app that turns dense text and documents into plain-language explanations.",
+      "An AI-powered web app that turns dense text and documents into plain-language explanations. People have used it for 2,000+ simplifications so far.",
     idea: "What good is access to information if you can't actually understand it?",
     story: [
       "I was researching a Tennessee education bill for a school project when I realized I could barely understand what I was reading. A few sentences in, I was already lost in cross-references and convoluted legal language. I asked my parents whether they understood it. They couldn't make much sense of it either.",
@@ -50,11 +50,11 @@ export const stars: Star[] = [
     ],
     proof: [
       { label: "Built", value: "Independently" },
-      { label: "Beta", value: "1,000+ simplifications" },
+      { label: "Reach", value: "1,000+ users" },
       { label: "Since", value: "2024" },
     ],
     results: [
-      "1,000+ simplifications during beta.",
+      "1,000+ users and 2,000+ simplifications.",
       "Led to my runner-up submission in The New York Times Learning Network's 2025 “Growing Up With A.I.” Challenge.",
     ],
     links: [{ label: "unjargon.ai", href: "https://unjargon.ai", status: "live" }],
