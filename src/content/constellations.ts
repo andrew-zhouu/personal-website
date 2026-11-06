@@ -16,7 +16,7 @@ export const constellations: Constellation[] = [
     color: "#62c8ff",
     layouts: {
       landscape: { center: { x: -190, y: -420 }, scale: 1.08, label: { x: -330, y: -80 } },
-      portrait: { center: { x: 10, y: -590 }, scale: 0.8, label: { x: -225, y: -240 } },
+      portrait: { center: { x: 10, y: -590 }, scale: 0.8, label: { x: -225, y: -265 } },
     },
     // A kite with a tail: the three shipped tools form the body, the
     // in-progress project trails off it.

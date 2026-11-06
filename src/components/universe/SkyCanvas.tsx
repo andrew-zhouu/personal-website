@@ -16,9 +16,9 @@ import { useCamera } from "./camera-engine";
  * Size (major/standard/minor) only nudges scale within each tier.
  */
 const LOOK = {
-  bright: { core: 6.4, halo: 62, haloO: 1, bloom: 17, bloomO: 0.55, white: 0.8 },
-  medium: { core: 5.1, halo: 34, haloO: 0.72, bloom: 8, bloomO: 0.25, white: 0.45 },
-  subtle: { core: 4.2, halo: 14, haloO: 0.28, bloom: 0, bloomO: 0, white: 0 },
+  bright: { core: 7, halo: 76, haloO: 1, bloom: 24, bloomO: 0.75, white: 0.86 },
+  medium: { core: 5.6, halo: 44, haloO: 0.9, bloom: 13, bloomO: 0.42, white: 0.55 },
+  subtle: { core: 4.6, halo: 20, haloO: 0.45, bloom: 0, bloomO: 0, white: 0 },
 } as const;
 const SIZE_K = { major: 1.14, standard: 1, minor: 0.9 } as const;
 
@@ -108,10 +108,10 @@ export function SkyCanvas({ universe, emphasis, signposts, selectedId, regionsAc
       <defs>
         {constellations.map((c) => (
           <radialGradient key={c.id} id={`glow-${c.id}`}>
-            <stop offset="0%" stopColor={mix(c.color, "#ffffff", 0.3)} stopOpacity={0.75} />
-            <stop offset="12%" stopColor={c.color} stopOpacity={0.42} />
-            <stop offset="38%" stopColor={c.color} stopOpacity={0.13} />
-            <stop offset="70%" stopColor={c.color} stopOpacity={0.035} />
+            <stop offset="0%" stopColor={mix(c.color, "#ffffff", 0.35)} stopOpacity={0.85} />
+            <stop offset="12%" stopColor={c.color} stopOpacity={0.5} />
+            <stop offset="36%" stopColor={c.color} stopOpacity={0.17} />
+            <stop offset="70%" stopColor={c.color} stopOpacity={0.05} />
             <stop offset="100%" stopColor={c.color} stopOpacity={0} />
           </radialGradient>
         ))}
@@ -191,7 +191,7 @@ export function SkyCanvas({ universe, emphasis, signposts, selectedId, regionsAc
             <path
               key={p.id}
               d={`M${p.from.x} ${p.from.y}L${p.end.x} ${p.end.y}`}
-              stroke={p.color}
+              stroke={p.items[0].color}
               strokeWidth={1.3}
               strokeDasharray="5 6"
               strokeLinecap="round"

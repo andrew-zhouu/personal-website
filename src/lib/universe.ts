@@ -26,7 +26,8 @@ export interface Bounds {
 
 export interface RelatedRef {
   id: string;
-  note: string;
+  label: string;
+  note?: string;
 }
 
 export interface ResolvedStar extends Star {
@@ -99,7 +100,12 @@ export const BRIGHTNESS_COPY: Record<Brightness, { label: string; description: s
 
 /** Human status line for a star, e.g. "Live", "Link coming soon". */
 export function statusText(star: Star): string {
-  if (star.links.some((l) => l.status === "live")) return "Live";
+  if (star.statusLabel) return star.statusLabel;
+  const live = star.links.find((l) => l.status === "live");
+  if (live) {
+    if (star.layout === "writing") return "Read online";
+    return live.note ? `Live · ${live.note.toLowerCase()}` : "Live";
+  }
   if (star.status === "in-progress") return "In progress";
   if (star.status === "forthcoming") return "Coming soon";
   if (star.links.some((l) => l.status === "unverified")) return "Link being verified";
@@ -218,8 +224,8 @@ export function buildUniverse(layout: Layout): Universe {
 
   const related = new Map<string, RelatedRef[]>();
   for (const c of connections) {
-    related.set(c.a, [...(related.get(c.a) ?? []), { id: c.b, note: c.note }]);
-    related.set(c.b, [...(related.get(c.b) ?? []), { id: c.a, note: c.note }]);
+    related.set(c.a, [...(related.get(c.a) ?? []), { id: c.b, label: c.label, note: c.note }]);
+    related.set(c.b, [...(related.get(c.b) ?? []), { id: c.a, label: c.label, note: c.note }]);
   }
 
   const resolvedStars: ResolvedStar[] = stars.map((s) => {
