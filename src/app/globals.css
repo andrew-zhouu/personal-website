@@ -578,25 +578,39 @@ button {
   background: rgb(18 26 52 / 0.95);
   border-color: var(--accent);
 }
-.signpost[data-side="right"] {
+.signpost-stack {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+}
+.signpost-stack[data-side="right"] {
   left: 4px;
   top: 0;
   transform: translateY(-50%);
+  align-items: flex-start;
 }
-.signpost[data-side="left"] {
+.signpost-stack[data-side="left"] {
   right: 4px;
   top: 0;
   transform: translateY(-50%);
+  align-items: flex-end;
 }
-.signpost[data-side="above"] {
+.signpost-stack[data-side="above"] {
   bottom: 4px;
   left: 0;
   transform: translateX(-50%);
+  align-items: center;
 }
-.signpost[data-side="below"] {
+.signpost-stack[data-side="below"] {
   top: 4px;
   left: 0;
   transform: translateX(-50%);
+  align-items: center;
+}
+.signpost-stack .signpost {
+  position: static;
 }
 .signpost-arrow {
   display: inline-block;
@@ -1166,4 +1180,433 @@ button.crumb:hover {
 }
 [data-layout="portrait"][data-level="constellation"] .const-label[data-flag="active"] {
   display: none;
+}
+
+/* ─── Phase 2: destinations ───────────────────────────────────────────── */
+.panel-tagline {
+  margin-top: 10px;
+  font-size: var(--t-xl);
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-ink-0);
+}
+.panel[data-mode="sheet"] .panel-tagline {
+  font-size: var(--t-lg);
+}
+.kicker-also {
+  font-size: var(--t-sm);
+  opacity: 0.85;
+}
+.action-note {
+  align-self: center;
+  font-size: var(--t-sm);
+  color: var(--color-ink-2);
+}
+.panel[data-size="wide"] .panel-scroll {
+  padding: 28px 36px 26px;
+}
+.panel[data-mode="sheet"] .panel-scroll {
+  padding: 18px 18px calc(24px + env(safe-area-inset-bottom));
+}
+
+/* Screenshots & photos */
+.shot {
+  margin-top: 22px;
+}
+.shot-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid rgb(200 212 240 / 0.18);
+  background: #0a0f1f;
+  box-shadow:
+    0 24px 60px -24px rgb(0 0 0 / 0.8),
+    0 0 0 1px rgb(0 0 0 / 0.4);
+  cursor: zoom-in;
+  transition: border-color 0.2s;
+}
+.shot-frame:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.shot-frame:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.shot-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.shot-zoom {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  background: rgb(6 10 22 / 0.75);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.shot-frame:hover .shot-zoom,
+.shot-frame:focus-visible .shot-zoom {
+  opacity: 1;
+}
+.shot-caption {
+  margin-top: 10px;
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+.shot[data-variant="photo"] .shot-frame {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+}
+.shot[data-variant="photo"] .shot-caption {
+  padding: 0 36px;
+  font-size: var(--t-base);
+  color: var(--color-ink-1);
+}
+.panel[data-mode="sheet"] .shot[data-variant="photo"] .shot-caption {
+  padding: 0 18px;
+}
+.shot-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+.photo-bleed {
+  margin: 4px -36px 0;
+}
+.panel[data-mode="sheet"] .photo-bleed {
+  margin: 4px -18px 0;
+}
+.panel[data-size="standard"] .photo-bleed {
+  margin: 4px -32px 0;
+}
+
+/* Full-size viewer */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 64px 24px 24px;
+  background: rgb(3 5 12 / 0.94);
+  cursor: zoom-out;
+}
+.viewer-figure {
+  max-width: min(1600px, 100%);
+  max-height: 100%;
+  cursor: default;
+}
+.viewer-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 140px);
+  border-radius: 4px;
+  box-shadow: 0 30px 90px -20px rgb(0 0 0 / 0.9);
+}
+.viewer-caption {
+  margin-top: 12px;
+  text-align: center;
+  font-size: var(--t-base);
+  color: var(--color-ink-1);
+}
+.viewer-close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+}
+
+/* Proof strip: small facts, scannable in a second. */
+.proof {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  margin-top: 22px;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-line);
+}
+.proof-item {
+  padding: 12px 16px;
+  background: #0c1227;
+}
+.proof dt {
+  font-size: var(--t-xs);
+  color: var(--color-ink-2);
+}
+.proof dd {
+  margin-top: 2px;
+  font-size: var(--t-md);
+  font-weight: 600;
+  color: #fff;
+}
+
+/* The idea behind the work: Andrew's own line, set large, not italic. */
+.idea {
+  margin-top: 26px;
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid var(--accent);
+}
+.idea p {
+  font-size: var(--t-2xl);
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: #fff;
+  text-wrap: balance;
+}
+.panel[data-mode="sheet"] .idea p {
+  font-size: var(--t-xl);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+.feature-grid > li {
+  padding: 10px 14px;
+  font-size: var(--t-base);
+  line-height: 1.45;
+  color: var(--color-ink-0);
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.02);
+}
+
+/* Writing */
+.reading {
+  max-width: 62ch;
+}
+.reading .panel-lead {
+  margin-top: 22px;
+}
+.reading .panel-p {
+  margin-top: 14px;
+  font-size: var(--t-md);
+  line-height: 1.7;
+}
+.panel[data-variant="writing"] .results {
+  margin-top: 20px;
+}
+.excerpt {
+  margin-top: 26px;
+  padding: 22px 0 6px;
+  border-top: 1px solid var(--color-line);
+}
+.excerpt blockquote p {
+  font-size: var(--t-2xl);
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-wrap: balance;
+}
+.excerpt figcaption {
+  margin-top: 10px;
+  font-size: var(--t-sm);
+  color: var(--color-ink-2);
+}
+.pieces {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--color-line);
+}
+.piece {
+  display: grid;
+  gap: 4px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.piece-form {
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: var(--accent);
+}
+.piece-title {
+  font-size: var(--t-xl);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.piece-desc {
+  font-size: var(--t-base);
+  line-height: 1.55;
+  color: var(--color-ink-1);
+  max-width: 60ch;
+}
+
+/* Connected work: the relationship line leads. */
+.related-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--t-md);
+  line-height: 1.4;
+  font-weight: 500;
+  color: #fff;
+}
+.related-label + .related-top .related-title {
+  font-size: var(--t-base);
+  font-weight: 600;
+  color: var(--accent);
+}
+.related.is-quiet {
+  padding: 10px 16px;
+  background: transparent;
+}
+
+/* About links as clear buttons */
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.about-link {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.about-link.is-pending {
+  border-style: dashed;
+}
+
+/* Event media: a clip and a photo strip sharing one height. */
+.media-pair {
+  /* Tall enough to feel like the centerpiece, short enough to sit fully
+     inside the panel on a laptop screen (header ≈ 350px above it). */
+  --media-h: clamp(300px, calc(100dvh - 350px), 540px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 22px;
+}
+.clip {
+  margin: 0;
+}
+.clip-video {
+  display: block;
+  height: var(--media-h);
+  width: auto;
+  max-width: 100%;
+  border-radius: 6px;
+  background: #0a0f1f;
+  box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.8);
+}
+.clip-video:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.media-pair .shot {
+  margin: 0;
+}
+.shot[data-variant="strip"] .shot-frame {
+  width: auto;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+}
+.shot[data-variant="strip"] .shot-img {
+  height: var(--media-h);
+  width: auto;
+}
+.media-pair .shot-caption {
+  max-width: 34ch;
+}
+/* Phones: stack, each piece at a comfortable size rather than two thumbnails. */
+.panel[data-mode="sheet"] .media-pair {
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+.panel[data-mode="sheet"] .clip-video {
+  /* Both auto + max-* keeps the clip's own 9:16 shape (no letterboxing). */
+  height: auto;
+  width: auto;
+  max-width: 100%;
+  max-height: 64vh;
+  margin: 0 auto;
+}
+.panel[data-mode="sheet"] .shot[data-variant="strip"] .shot-frame {
+  width: 100%;
+}
+.panel[data-mode="sheet"] .shot[data-variant="strip"] .shot-img {
+  height: auto;
+  width: 100%;
+}
+.panel[data-mode="sheet"] .media-pair .shot,
+.panel[data-mode="sheet"] .clip {
+  width: min(100%, 420px);
+}
+
+/* Creative layout: a few real numbers, set large but quiet — not a dashboard. */
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 36px;
+  margin-top: 26px;
+  padding: 22px 0 20px;
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+}
+.metric {
+  display: flex;
+  /* Label comes first in the markup (dt/dd), value reads first on screen. */
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.metric-value {
+  font-size: var(--t-3xl);
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.metric-label {
+  margin-top: 4px;
+  font-size: var(--t-base);
+  color: var(--accent);
+}
+.panel[data-mode="sheet"] .metrics {
+  gap: 14px 24px;
+}
+.panel[data-mode="sheet"] .metric-value {
+  font-size: var(--t-2xl);
+}
+.footnote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  font-size: var(--t-sm);
+  color: var(--color-ink-2);
+}
+.footnote-mark {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
 }

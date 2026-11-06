@@ -19,6 +19,9 @@ export type ConstellationId = "build" | "write" | "solve" | "connect";
  * - `experience`  – a competition, community or event with a story to tell.
  * - `in-progress` – ongoing work without substantial public material yet.
  * - `forthcoming` – a placeholder for content that will be added later.
+ *
+ * Brightness reflects what a visitor can explore now; it never reflects how
+ * impressive something is.
  */
 export type StarStatus = "work" | "experience" | "in-progress" | "forthcoming";
 
@@ -33,15 +36,46 @@ export interface StarLink {
   label: string;
   href: string | null;
   status: LinkStatus;
+  /** Short qualifier shown beside the link, e.g. "Early access". */
+  note?: string;
 }
 
-export interface StarMedia {
-  kind: "screenshot" | "photo";
-  /** Path under /public, or null while the asset hasn't been supplied. */
-  src: string | null;
+/** A real image under /public. Dimensions keep layout stable while loading. */
+export interface StarImage {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+}
+
+/** A short muted clip (MP4) with a poster frame; plays inline, never with sound by default. */
+export interface StarVideo {
+  src: string;
+  poster: string;
+  width: number;
+  height: number;
+  /** Describes what the clip shows, for screen readers. */
   alt: string;
   caption?: string;
 }
+
+/** A piece inside a writing collection (title and description from the work itself). */
+export interface WritingPiece {
+  title: string;
+  form: string;
+  description: string;
+}
+
+/**
+ * How a star's destination is laid out:
+ * - `product`  – flagship software: screenshot first, live link, story, proof.
+ * - `writing`  – editorial: reading width, pieces, recognition.
+ * - `photo`    – a photograph is the centerpiece.
+ * - `compact`  – supporting experience: short and to the point.
+ * - `creative` – a creative pursuit: personal words plus a few real numbers.
+ */
+export type StarLayout = "product" | "writing" | "photo" | "compact" | "creative";
 
 /** Visual prominence within the composition (independent of brightness). */
 export type StarSize = "major" | "standard" | "minor";
@@ -61,16 +95,44 @@ export interface Star {
   size: StarSize;
   /** Featured stars keep their label on compact (mobile) overviews. */
   featured?: boolean;
-  /** One or two sentences. Always real content. */
+  layout: StarLayout;
+  /** Longer title for the detail view when the map label is a short name. */
+  detailTitle?: string;
+  /** A few headline figures (creative layout), e.g. { value: "5,000+", label: "followers" }. */
+  metrics?: { value: string; label: string }[];
+  /** A small secondary distinction shown quietly below the main content. */
+  footnote?: string;
+  /** Overrides the derived status line (e.g. "Runner-up"). */
+  statusLabel?: string;
+  /** One line that says what this is, shown large under the title. */
+  tagline: string;
+  /** One or two plain sentences: what it is. Always real content. */
   summary: string;
-  /** Longer description paragraphs. Empty → an honest placeholder is shown. */
-  details: string[];
-  /** What Andrew specifically did. Empty → placeholder. */
+  /** The story, in paragraphs. Empty → section omitted. */
+  story: string[];
+  /** A line of Andrew's own that captures the idea (not a quotation from elsewhere). */
+  idea?: string;
+  /** What the product does (product layout). */
+  features?: string[];
+  /** Things worth noticing in the screenshot (product layout). */
+  highlights?: string[];
+  /** What Andrew specifically did. Empty → section omitted. */
   contributions: string[];
-  /** Outcomes and recognition. Empty → section hidden. */
+  /** Small key/value facts, e.g. { label: "Beta", value: "1,000+ simplifications" }. */
+  proof?: { label: string; value: string }[];
+  /** Outcomes and recognition. Empty → section omitted. */
   results: string[];
+  /** Pieces in a writing collection. */
+  pieces?: WritingPiece[];
+  /** A short excerpt from the actual work, with its source. */
+  excerpt?: { text: string; source: string };
   links: StarLink[];
-  media: StarMedia | null;
+  /** First image is the hero. */
+  images: StarImage[];
+  /** Optional clip shown with the images (photo layout). */
+  video?: StarVideo;
+  /** Former ids that should still deep-link to this star. */
+  aliases?: string[];
   /** Position relative to the constellation's center, in world units. */
   position: Vec;
   /** Optional override. By default the label goes wherever lines aren't. */
@@ -115,8 +177,10 @@ export interface Constellation {
 export interface Connection {
   a: string;
   b: string;
-  /** Why these two are connected, in plain language. */
-  note: string;
+  /** A short line naming the relationship, e.g. "Understanding was only the first step." */
+  label: string;
+  /** Optional longer explanation. */
+  note?: string;
 }
 
 export interface ProfileLink {
@@ -134,8 +198,6 @@ export interface Profile {
   tagline: string;
   about: {
     paragraphs: string[];
-    /** Shown while the full bio hasn't been written. */
-    placeholder: string;
   };
   links: ProfileLink[];
 }

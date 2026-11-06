@@ -15,8 +15,8 @@ export const constellations: Constellation[] = [
     description: "Apps, websites, and software I've made.",
     color: "#62c8ff",
     layouts: {
-      landscape: { center: { x: -190, y: -420 }, scale: 1.08, label: { x: -330, y: -80 } },
-      portrait: { center: { x: 10, y: -590 }, scale: 0.8, label: { x: -225, y: -240 } },
+      landscape: { center: { x: -190, y: -420 }, scale: 1.08, label: { x: -350, y: -80 } },
+      portrait: { center: { x: 10, y: -590 }, scale: 0.8, label: { x: -225, y: -265 } },
     },
     // A kite with a tail: the three shipped tools form the body, the
     // in-progress project trails off it.
@@ -34,8 +34,8 @@ export const constellations: Constellation[] = [
     description: "Essays, creative nonfiction, poetry, and published writing.",
     color: "#b8a6ff",
     layouts: {
-      landscape: { center: { x: 650, y: -215 }, label: { x: 95, y: -230 } },
-      portrait: { center: { x: -70, y: -330 }, scale: 0.75, label: { x: 350, y: 0 } },
+      landscape: { center: { x: 650, y: -215 }, label: { x: 165, y: -245 } },
+      portrait: { center: { x: -35, y: -330 }, scale: 0.75, label: { x: 350, y: 25 } },
     },
     shape: [
       ["nyt-growing-up-with-ai", "creative-nonfiction"],
@@ -49,7 +49,7 @@ export const constellations: Constellation[] = [
     description: "Mathematics, competitive problem-solving, and analytical thinking.",
     color: "#6fe0b0",
     layouts: {
-      landscape: { center: { x: -600, y: 250 }, label: { x: -150, y: -125 } },
+      landscape: { center: { x: -600, y: 250 }, label: { x: -205, y: -140 } },
       portrait: { center: { x: -150, y: 330 }, scale: 0.75, label: { x: 440, y: -20 } },
     },
     // Both branches are real relationships, meeting at competition math.
@@ -65,9 +65,15 @@ export const constellations: Constellation[] = [
     description: "Communities, collaborations, mentoring, and experiences involving other people.",
     color: "#f3c06a",
     layouts: {
-      landscape: { center: { x: 500, y: 380 }, label: { x: 200, y: 25 } },
+      landscape: { center: { x: 500, y: 380 }, label: { x: 285, y: 130 } },
       portrait: { center: { x: 120, y: 580 }, scale: 0.75, label: { x: -395, y: 20 } },
     },
-    shape: [["scottylabs", "hackathons"]],
+    // A loose, bent chain. These are structural lines only; they don't claim
+    // the experiences are related to each other.
+    shape: [
+      ["codecrew", "hackcmu"],
+      ["hackcmu", "scottylabs"],
+      ["scottylabs", "viola"],
+    ],
   },
 ];

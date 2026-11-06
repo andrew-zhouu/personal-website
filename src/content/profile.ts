@@ -6,18 +6,17 @@ export const profile: Profile = {
   tagline: "Builder, writer, problem-solver.",
   about: {
     paragraphs: [
-      "I study computer science at Carnegie Mellon. My work spans software, writing, and mathematics.",
-      "This map arranges that work into four constellations — Build, Write, Solve and Connect — with lines between the pieces that grew out of each other.",
+      "I build things, write things, and spend a lot of time thinking about problems I probably could have just ignored.",
+      "I’m studying computer science at Carnegie Mellon, but my interests have always wandered between software, mathematics, and writing. I especially like finding an interesting question and following it far enough that it turns into something real.",
     ],
-    placeholder: "A longer introduction is coming soon.",
   },
-  // Add real URLs here when they're ready. `href: null` renders as a disabled
-  // "coming soon" item and never as a working link.
+  // `href: null` renders as a disabled "coming soon" item, never a working link.
   links: [
     { id: "about", label: "About", kind: "internal", href: null },
-    { id: "resume", label: "Résumé", kind: "external", href: null },
-    { id: "contact", label: "Contact", kind: "external", href: null },
-    { id: "github", label: "GitHub", kind: "external", href: null },
-    { id: "linkedin", label: "LinkedIn", kind: "external", href: null },
+    // Public product résumé (version without phone number).
+    { id: "resume", label: "Résumé", kind: "external", href: "/andrew-zhou-resume.pdf" },
+    { id: "contact", label: "Contact", kind: "external", href: "mailto:andrewzhou135@gmail.com" },
+    { id: "github", label: "GitHub", kind: "external", href: "https://github.com/andrew-zhouu" },
+    { id: "linkedin", label: "LinkedIn", kind: "external", href: "https://www.linkedin.com/in/andrewzhouu" },
   ],
 };

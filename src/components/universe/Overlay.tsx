@@ -34,7 +34,13 @@ export function ProfileLinks({
     }
     if (l.href) {
       return (
-        <a key={l.id} href={l.href} target="_blank" rel="noopener noreferrer" className={`hub-link ${itemClassName}`}>
+        <a
+          key={l.id}
+          href={l.href}
+          {...(/^https?:|\.pdf$/.test(l.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className={`hub-link ${itemClassName}`}
+          title={l.href.startsWith("mailto:") ? l.href.slice(7) : undefined}
+        >
           {l.label}
         </a>
       );
@@ -239,25 +245,34 @@ export function SignpostNode({
   const angle = (Math.atan2(p.dir.y, p.dir.x) * 180) / Math.PI;
   return (
     <div ref={ref} className="anchor">
-      <button
-        type="button"
-        className="signpost focus-ring"
+      <ul
+        className="signpost-stack"
         data-side={p.side}
-        style={{ "--accent": p.color, marginLeft: p.nudge || undefined } as React.CSSProperties}
-        onClick={() => onNavigate(p.target)}
-        // Hovering the signpost keeps its star "hovered" so it doesn't vanish.
+        style={{ marginLeft: p.nudge || undefined }}
+        // Hovering a signpost keeps its star "hovered" so it doesn't vanish.
         onPointerEnter={(e) => e.pointerType === "mouse" && onHover({ kind: "star", id: p.source })}
         onPointerLeave={(e) => e.pointerType === "mouse" && onHover(null)}
-        aria-label={p.sub ? `Go to ${p.label} in ${p.sub}` : `Go to ${p.label.replace("Also part of ", "")}`}
       >
-        <span className="signpost-arrow" style={{ transform: `rotate(${angle}deg)` }} aria-hidden="true">
-          →
-        </span>
-        <span className="signpost-text">
-          <span className="signpost-label">{p.label}</span>
-          {p.sub && <span className="signpost-sub">{p.sub}</span>}
-        </span>
-      </button>
+        {p.items.map((it) => (
+          <li key={it.label}>
+            <button
+              type="button"
+              className="signpost focus-ring"
+              style={{ "--accent": it.color } as React.CSSProperties}
+              onClick={() => onNavigate(it.target)}
+              aria-label={it.sub ? `Go to ${it.label} in ${it.sub}` : `Go to ${it.label.replace("Also part of ", "")}`}
+            >
+              <span className="signpost-arrow" style={{ transform: `rotate(${angle}deg)` }} aria-hidden="true">
+                →
+              </span>
+              <span className="signpost-text">
+                <span className="signpost-label">{it.label}</span>
+                {it.sub && <span className="signpost-sub">{it.sub}</span>}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -30,6 +30,8 @@ function parseHash(hash: string, u: Universe): View {
   if (id === "about") return { kind: "about" };
   if (u.constellationById.has(id as ConstellationId)) return { kind: "constellation", id: id as ConstellationId };
   if (u.starById.has(id)) return { kind: "star", id };
+  const renamed = u.stars.find((s) => s.aliases?.includes(id));
+  if (renamed) return { kind: "star", id: renamed.id };
   return { kind: "overview" };
 }
 
@@ -78,7 +80,13 @@ export default function UniverseApp() {
     const el = rootRef.current!;
     const measure = () => setVp({ w: el.clientWidth, h: el.clientHeight });
     measure();
-    setView(parseHash(window.location.hash, buildUniverse(layoutFor({ w: el.clientWidth, h: el.clientHeight }))));
+    const initial = parseHash(window.location.hash, buildUniverse(layoutFor({ w: el.clientWidth, h: el.clientHeight })));
+    setView(initial);
+    // Normalize renamed ids (e.g. #hackathons → #hackcmu) without adding history.
+    const canonical = toHash(initial);
+    if (canonical && window.location.hash !== canonical) {
+      window.history.replaceState(null, "", canonical);
+    }
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
@@ -271,7 +279,7 @@ export default function UniverseApp() {
                       constellationName={universe.constellationById.get(s.constellation)!.name}
                       emphasis={em}
                       showLabel={showLabel}
-                      showMeta={(level === "constellation" && inFocus) || em.flag === "active"}
+                      showMeta={showLabel && ((level === "constellation" && inFocus) || em.flag === "active")}
                       interactive={!(compact && level === "overview") || !!s.featured}
                       selected={s.id === selectedId}
                       onSelect={selectStar}
