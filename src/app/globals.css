@@ -1489,3 +1489,72 @@ button.crumb:hover {
 .about-link.is-pending {
   border-style: dashed;
 }
+
+/* Event media: a clip and a photo strip sharing one height. */
+.media-pair {
+  /* Tall enough to feel like the centerpiece, short enough to sit fully
+     inside the panel on a laptop screen (header ≈ 350px above it). */
+  --media-h: clamp(300px, calc(100dvh - 350px), 540px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 22px;
+}
+.clip {
+  margin: 0;
+}
+.clip-video {
+  display: block;
+  height: var(--media-h);
+  width: auto;
+  max-width: 100%;
+  border-radius: 6px;
+  background: #0a0f1f;
+  box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.8);
+}
+.clip-video:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.media-pair .shot {
+  margin: 0;
+}
+.shot[data-variant="strip"] .shot-frame {
+  width: auto;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+}
+.shot[data-variant="strip"] .shot-img {
+  height: var(--media-h);
+  width: auto;
+}
+.media-pair .shot-caption {
+  max-width: 34ch;
+}
+/* Phones: stack, each piece at a comfortable size rather than two thumbnails. */
+.panel[data-mode="sheet"] .media-pair {
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+.panel[data-mode="sheet"] .clip-video {
+  /* Both auto + max-* keeps the clip's own 9:16 shape (no letterboxing). */
+  height: auto;
+  width: auto;
+  max-width: 100%;
+  max-height: 64vh;
+  margin: 0 auto;
+}
+.panel[data-mode="sheet"] .shot[data-variant="strip"] .shot-frame {
+  width: 100%;
+}
+.panel[data-mode="sheet"] .shot[data-variant="strip"] .shot-img {
+  height: auto;
+  width: 100%;
+}
+.panel[data-mode="sheet"] .media-pair .shot,
+.panel[data-mode="sheet"] .clip {
+  width: min(100%, 420px);
+}

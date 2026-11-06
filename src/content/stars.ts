@@ -380,25 +380,41 @@ export const stars: Star[] = [
     position: { x: -20, y: -140 },
   },
   {
-    id: "hackathons",
-    title: "Hackathons & Mentoring",
+    id: "hackcmu",
+    // Earlier deep links (#hackathons) still land here.
+    aliases: ["hackathons"],
+    title: "HackCMU",
+    subtitle: "Carnegie Mellon · 2026",
     constellation: "connect",
     status: "experience",
     size: "standard",
-    layout: "compact",
-    tagline: "Building with people, and helping other people build.",
+    layout: "photo",
+    tagline: "Helping bring a campus hackathon to life.",
     summary:
-      "I’ve been part of hackathon communities as a mentor, judge, and organizer.",
+      "I helped organize HackCMU at Carnegie Mellon as part of the organizing team, working on event operations and logistics. I also mentored participants and judged projects.",
     story: [
-      "I like environments where people try unconventional ideas, collaborate quickly, and learn from one another.",
+      "The part I enjoyed most was being around people building wildly different things, and watching ideas turn into actual projects over the course of the event.",
     ],
-    contributions: [
-      "HackCMU (2026): helped run the event, mentored participant teams, and judged projects.",
-      "CodeCrew (2023–2025): mentored K–12 students in programming and debugging, coached a winning team in 2024, and judged student projects in 2025.",
-    ],
+    contributions: [],
     results: [],
     links: [],
-    images: [],
+    video: {
+      src: "/media/hackcmu.mp4",
+      poster: "/media/hackcmu-poster.webp",
+      width: 720,
+      height: 1280,
+      alt: "A slow pan across a packed auditorium of HackCMU participants, with tables of prizes and swag in the foreground.",
+      caption: "A look inside HackCMU.",
+    },
+    images: [
+      {
+        src: "/images/hackcmu-photo-strip.webp",
+        alt: "A three-frame photo-booth strip of Andrew with fellow organizers and event partners, smiling and making peace signs.",
+        width: 1000,
+        height: 2114,
+        caption: "With fellow organizers and event partners.",
+      },
+    ],
     position: { x: -170, y: 40 },
   },
 ];

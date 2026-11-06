@@ -49,6 +49,17 @@ export interface StarImage {
   caption?: string;
 }
 
+/** A short muted clip (MP4) with a poster frame; plays inline, never with sound by default. */
+export interface StarVideo {
+  src: string;
+  poster: string;
+  width: number;
+  height: number;
+  /** Describes what the clip shows, for screen readers. */
+  alt: string;
+  caption?: string;
+}
+
 /** A piece inside a writing collection (title and description from the work itself). */
 export interface WritingPiece {
   title: string;
@@ -111,6 +122,10 @@ export interface Star {
   links: StarLink[];
   /** First image is the hero. */
   images: StarImage[];
+  /** Optional clip shown with the images (photo layout). */
+  video?: StarVideo;
+  /** Former ids that should still deep-link to this star. */
+  aliases?: string[];
   /** Position relative to the constellation's center, in world units. */
   position: Vec;
   /** Optional override. By default the label goes wherever lines aren't. */

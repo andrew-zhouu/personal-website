@@ -1,10 +1,10 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { profile, type StarImage, type StarLink } from "@/content";
+import { profile, type StarImage, type StarLink, type StarVideo } from "@/content";
 import { panelGeometry, type PanelSize, type View, type Viewport } from "@/lib/camera";
 import { statusText, type ResolvedStar, type Universe } from "@/lib/universe";
 import { ProfileLinks } from "./Overlay";
@@ -167,7 +167,7 @@ function Shot({
   priority,
 }: {
   image: StarImage;
-  variant?: "screen" | "photo" | "thumb";
+  variant?: "screen" | "photo" | "thumb" | "strip";
   sizes: string;
   priority?: boolean;
 }) {
@@ -508,15 +508,72 @@ function WritingBody({ star, universe, onNavigate }: VariantProps) {
   );
 }
 
-/** A photograph as the centerpiece; words stay brief. */
+/**
+ * A short event clip. Muted, looping, inline, with native controls. It starts
+ * only once the destination has settled and the clip is actually in view, and
+ * never under reduced motion; until then only metadata + poster load.
+ */
+function Clip({ video }: { video: StarVideo }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const reduced = !!useReducedMotion();
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || reduced) return;
+    let io: IntersectionObserver | null = null;
+    // Wait for the camera and panel to finish arriving before any playback.
+    const t = window.setTimeout(() => {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) el.play().catch(() => {});
+          else el.pause();
+        },
+        { threshold: 0.5 },
+      );
+      io.observe(el);
+    }, 1000);
+    return () => {
+      window.clearTimeout(t);
+      io?.disconnect();
+    };
+  }, [reduced]);
+  return (
+    <figure className="clip">
+      <video
+        ref={ref}
+        className="clip-video"
+        src={video.src}
+        poster={video.poster}
+        width={video.width}
+        height={video.height}
+        muted
+        loop
+        playsInline
+        controls
+        preload={reduced ? "none" : "metadata"}
+        aria-label={video.alt}
+      />
+      {video.caption && <figcaption className="shot-caption">{video.caption}</figcaption>}
+    </figure>
+  );
+}
+
+/** A photograph (or a clip and a photo) as the centerpiece; words stay brief. */
 function PhotoBody({ star, universe, onNavigate }: VariantProps) {
   const [photo] = star.images;
   return (
     <>
-      {photo && (
-        <div className="photo-bleed">
-          <Shot image={photo} variant="photo" sizes="(max-width: 900px) 100vw, 820px" priority />
+      {star.video ? (
+        // Event layout: clip and photo side by side at a shared height.
+        <div className="media-pair">
+          <Clip video={star.video} />
+          {photo && <Shot image={photo} variant="strip" sizes="(max-width: 900px) 100vw, 360px" />}
         </div>
+      ) : (
+        photo && (
+          <div className="photo-bleed">
+            <Shot image={photo} variant="photo" sizes="(max-width: 900px) 100vw, 820px" priority />
+          </div>
+        )
       )}
       <div className="reading">
         <p className="panel-lead">{star.summary}</p>

@@ -26,6 +26,10 @@ function validate() {
     if (ids.has(s.id)) problems.push(`Duplicate id "${s.id}"`);
     ids.add(s.id);
     starIds.add(s.id);
+    for (const alias of s.aliases ?? []) {
+      if (ids.has(alias)) problems.push(`Star "${s.id}" alias "${alias}" collides with another id`);
+      ids.add(alias);
+    }
     if (!constellationIds.has(s.constellation))
       problems.push(`Star "${s.id}" has unknown constellation "${s.constellation}"`);
     for (const l of s.links) {

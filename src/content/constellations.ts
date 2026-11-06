@@ -68,6 +68,6 @@ export const constellations: Constellation[] = [
       landscape: { center: { x: 500, y: 380 }, label: { x: 200, y: 25 } },
       portrait: { center: { x: 120, y: 580 }, scale: 0.75, label: { x: -395, y: 20 } },
     },
-    shape: [["scottylabs", "hackathons"]],
+    shape: [["scottylabs", "hackcmu"]],
   },
 ];
