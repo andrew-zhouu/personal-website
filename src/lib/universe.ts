@@ -104,6 +104,7 @@ export function statusText(star: Star): string {
   const live = star.links.find((l) => l.status === "live");
   if (live) {
     if (star.layout === "writing") return "Read online";
+    if (star.layout === "creative") return "Watch online";
     return live.note ? `Live · ${live.note.toLowerCase()}` : "Live";
   }
   if (star.status === "in-progress") return "In progress";

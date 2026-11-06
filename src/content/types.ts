@@ -73,8 +73,9 @@ export interface WritingPiece {
  * - `writing`  – editorial: reading width, pieces, recognition.
  * - `photo`    – a photograph is the centerpiece.
  * - `compact`  – supporting experience: short and to the point.
+ * - `creative` – a creative pursuit: personal words plus a few real numbers.
  */
-export type StarLayout = "product" | "writing" | "photo" | "compact";
+export type StarLayout = "product" | "writing" | "photo" | "compact" | "creative";
 
 /** Visual prominence within the composition (independent of brightness). */
 export type StarSize = "major" | "standard" | "minor";
@@ -95,6 +96,12 @@ export interface Star {
   /** Featured stars keep their label on compact (mobile) overviews. */
   featured?: boolean;
   layout: StarLayout;
+  /** Longer title for the detail view when the map label is a short name. */
+  detailTitle?: string;
+  /** A few headline figures (creative layout), e.g. { value: "5,000+", label: "followers" }. */
+  metrics?: { value: string; label: string }[];
+  /** A small secondary distinction shown quietly below the main content. */
+  footnote?: string;
   /** Overrides the derived status line (e.g. "Runner-up"). */
   statusLabel?: string;
   /** One line that says what this is, shown large under the title. */

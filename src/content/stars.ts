@@ -174,7 +174,8 @@ export const stars: Star[] = [
   // ─── WRITE ────────────────────────────────────────────────────────────────
   {
     id: "nyt-growing-up-with-ai",
-    title: "Growing Up With A.I.",
+    title: "NYT: Growing Up With A.I.",
+    detailTitle: "New York Times — Growing Up With A.I.",
     subtitle: "The New York Times Learning Network",
     constellation: "write",
     status: "work",
@@ -377,7 +378,7 @@ export const stars: Star[] = [
     results: [],
     links: [],
     images: [],
-    position: { x: -20, y: -140 },
+    position: { x: -30, y: -150 },
   },
   {
     id: "hackcmu",
@@ -391,9 +392,9 @@ export const stars: Star[] = [
     layout: "photo",
     tagline: "Helping bring a campus hackathon to life.",
     summary:
-      "I helped organize HackCMU at Carnegie Mellon as part of the organizing team, working on event operations and logistics. I also mentored participants and judged projects.",
+      "I helped organize HackCMU at Carnegie Mellon as part of the organizing team, contributing to event operations, logistics, and participant coordination. I also mentored teams and judged projects.",
     story: [
-      "The part I enjoyed most was being around people building wildly different things, and watching ideas turn into actual projects over the course of the event.",
+      "What I especially enjoyed was being around people building wildly different things, and watching ideas turn into working projects over the course of the event.",
     ],
     contributions: [],
     results: [],
@@ -415,6 +416,57 @@ export const stars: Star[] = [
         caption: "With fellow organizers and event partners.",
       },
     ],
-    position: { x: -170, y: 40 },
+    position: { x: -190, y: 25 },
+  },
+  {
+    id: "codecrew",
+    title: "CodeCrew",
+    subtitle: "Memphis · 2023–2025",
+    constellation: "connect",
+    status: "experience",
+    size: "standard",
+    layout: "compact",
+    tagline: "Helping younger students discover what they can build with code.",
+    summary:
+      "Through CodeCrew, I worked with younger students in Memphis who were learning to program and building their own projects.",
+    story: [
+      "I helped them debug code, work through technical problems, and get their ideas working in time for hackathons. One of the teams I coached ended up winning in 2024, which was especially rewarding.",
+    ],
+    contributions: [
+      "Mentored K–12 students in programming and hackathon project development.",
+      "Helped students work through technical problems and turn their ideas into something functional.",
+    ],
+    results: ["Coached a team that won in 2024.", "Judged student hackathon projects in 2025."],
+    links: [],
+    images: [],
+    position: { x: -30, y: 135 },
+  },
+  {
+    id: "viola",
+    title: "Viola & Music",
+    detailTitle: "Viola & Content Creation",
+    constellation: "connect",
+    status: "work",
+    size: "standard",
+    layout: "creative",
+    tagline: "Sharing viola performances and making music more accessible to other musicians.",
+    summary:
+      "Outside of software, math, and writing, I play the viola and make music content.",
+    story: [
+      "I share performances and transcribe pop and classical music into sheet music that other players can pick up and use. Playing is a creative outlet for me; posting has turned into a way to connect with other musicians and with people who just like the viola.",
+      "The music is all over the place: Carol of the Bells, “He’s a Pirate,” YOASOBI’s “Into the Night,” “Golden Brown.”",
+    ],
+    // Cumulative reach across Andrew's viola content (his figures).
+    metrics: [
+      { value: "5K+", label: "followers" },
+      { value: "1M+", label: "views" },
+      { value: "190K+", label: "likes" },
+    ],
+    footnote: "2× TNMEA All-State Violist",
+    contributions: [],
+    results: [],
+    links: [{ label: "@anxdyw on TikTok", href: "https://www.tiktok.com/@anxdyw", status: "live" }],
+    images: [],
+    position: { x: 195, y: -35 },
   },
 ];

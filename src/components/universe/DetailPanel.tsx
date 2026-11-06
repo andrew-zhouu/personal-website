@@ -259,7 +259,7 @@ function Header({
         <CloseButton label={`Close and return to ${c.name}`} onClick={onClose} />
       </div>
       <h2 id={headingId} ref={headingRef} tabIndex={-1} className="panel-title">
-        {star.title}
+        {star.detailTitle ?? star.title}
       </h2>
       {star.subtitle && <p className="panel-subtitle">{star.subtitle}</p>}
       <p className="panel-tagline">{star.tagline}</p>
@@ -605,11 +605,41 @@ function CompactBody({ star, universe, onNavigate }: VariantProps) {
         </Section>
       )}
       {star.results.length > 0 && (
-        <Section title="Results">
+        <Section title="Highlights">
           <Results items={star.results} />
         </Section>
       )}
       <LinkButtons links={star.links} />
+      <Connected star={star} universe={universe} onNavigate={onNavigate} />
+    </>
+  );
+}
+
+/** A creative pursuit: a few real numbers, personal words, a quiet footnote. */
+function CreativeBody({ star, universe, onNavigate }: VariantProps) {
+  return (
+    <>
+      {star.metrics && (
+        <dl className="metrics">
+          {star.metrics.map((m) => (
+            <div key={m.label} className="metric">
+              <dt className="metric-label">{m.label}</dt>
+              <dd className="metric-value">{m.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <div className="reading">
+        <p className="panel-lead">{star.summary}</p>
+        <Story paragraphs={star.story} />
+      </div>
+      <LinkButtons links={star.links} primaryLabel={(l) => l.label} />
+      {star.footnote && (
+        <p className="footnote">
+          <span className="footnote-mark" aria-hidden="true" />
+          {star.footnote}
+        </p>
+      )}
       <Connected star={star} universe={universe} onNavigate={onNavigate} />
     </>
   );
@@ -620,6 +650,7 @@ const SIZE: Record<ResolvedStar["layout"], PanelSize> = {
   photo: "wide",
   writing: "standard",
   compact: "compact",
+  creative: "standard",
 };
 
 export function StarPanel({
@@ -657,6 +688,7 @@ export function StarPanel({
       {star.layout === "writing" && <WritingBody {...props} />}
       {star.layout === "photo" && <PhotoBody {...props} />}
       {star.layout === "compact" && <CompactBody {...props} />}
+      {star.layout === "creative" && <CreativeBody {...props} />}
       <Footer back={back} backLabel={c.name} onHome={() => onNavigate({ kind: "overview" })} />
     </PanelShell>
   );

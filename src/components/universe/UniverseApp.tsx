@@ -279,7 +279,7 @@ export default function UniverseApp() {
                       constellationName={universe.constellationById.get(s.constellation)!.name}
                       emphasis={em}
                       showLabel={showLabel}
-                      showMeta={(level === "constellation" && inFocus) || em.flag === "active"}
+                      showMeta={showLabel && ((level === "constellation" && inFocus) || em.flag === "active")}
                       interactive={!(compact && level === "overview") || !!s.featured}
                       selected={s.id === selectedId}
                       onSelect={selectStar}

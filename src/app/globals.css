@@ -1558,3 +1558,55 @@ button.crumb:hover {
 .panel[data-mode="sheet"] .clip {
   width: min(100%, 420px);
 }
+
+/* Creative layout: a few real numbers, set large but quiet — not a dashboard. */
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 36px;
+  margin-top: 26px;
+  padding: 22px 0 20px;
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+}
+.metric {
+  display: flex;
+  /* Label comes first in the markup (dt/dd), value reads first on screen. */
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.metric-value {
+  font-size: var(--t-3xl);
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.metric-label {
+  margin-top: 4px;
+  font-size: var(--t-base);
+  color: var(--accent);
+}
+.panel[data-mode="sheet"] .metrics {
+  gap: 14px 24px;
+}
+.panel[data-mode="sheet"] .metric-value {
+  font-size: var(--t-2xl);
+}
+.footnote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  font-size: var(--t-sm);
+  color: var(--color-ink-2);
+}
+.footnote-mark {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
