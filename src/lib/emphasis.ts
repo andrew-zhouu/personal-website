@@ -21,7 +21,17 @@ export interface Emphasis {
   hub: number;
 }
 
-export function computeEmphasis(u: Universe, view: View, hover: Hover, compact: boolean): Emphasis {
+/**
+ * @param onscreen relationship edges whose two ends are both visible at the
+ *   current camera target (null = all, i.e. the overview). Others are never
+ *   drawn as full lines; see `linkVisibility`.
+ */
+export function computeEmphasis(
+  u: Universe,
+  view: View,
+  hover: Hover,
+  onscreen: Set<string> | null,
+): Emphasis {
   const selected = view.kind === "star" ? u.starById.get(view.id) : undefined;
   const focusC: ConstellationId | undefined =
     view.kind === "constellation" ? view.id : selected?.constellation;
@@ -81,33 +91,38 @@ export function computeEmphasis(u: Universe, view: View, hover: Hover, compact: 
   const edge = new Map<string, { o: number; active: boolean }>();
   for (const e of u.edges) {
     const touchesActive = !!activeStar && (e.a === activeStar || e.b === activeStar);
+    const touchesHover = !!hoverStar && (e.a === hoverStar.id || e.b === hoverStar.id);
     const touchesFocus = !!focusC && e.constellations.includes(focusC);
     let o: number;
-    if (e.kind === "relation") {
-      if (view.kind === "overview") o = compact && e.cross ? 0.08 : 0.3;
-      else if (view.kind === "constellation") o = touchesFocus ? 0.5 : 0.08;
-      else if (view.kind === "star") o = touchesActive ? 0.9 : 0.1;
-      else o = 0.12;
-    } else if (e.kind === "shape") {
-      if (view.kind === "overview") o = 0.16;
-      else if (view.kind === "constellation") o = touchesFocus ? 0.3 : 0.06;
-      else if (view.kind === "star") o = touchesFocus ? 0.2 : 0.05;
-      else o = 0.08;
-    } else {
-      o = 0;
-      if (view.kind === "constellation" && e.constellations[0] === focusC) o = 0.18;
-    }
+    let active = false;
 
-    if (hoverStar) {
-      if (touchesActive) o = e.kind === "shape" ? 0.3 : e.kind === "association" ? 0.55 : 0.95;
-      else o = Math.min(o, e.kind === "shape" ? 0.08 : 0.1);
-    } else if (hoverC) {
-      if (e.constellations.includes(hoverC)) o = Math.max(o, e.kind === "shape" ? 0.32 : e.kind === "relation" ? 0.55 : 0);
-      else o *= 0.6;
-    } else if (touchesActive && e.kind === "association") {
-      o = 0.5;
+    if (e.kind === "shape") {
+      // Structural figure: always faintly present, stronger where you are.
+      if (view.kind === "overview") o = 0.26;
+      else if (view.kind === "constellation") o = touchesFocus ? 0.42 : 0.12;
+      else if (view.kind === "star") o = touchesFocus ? 0.3 : 0.08;
+      else o = 0.1;
+      if (hoverC) o = e.constellations.includes(hoverC) ? 0.45 : o * 0.6;
+      if (e.related && touchesActive) {
+        o = 0.85;
+        active = true;
+      } else if (hoverStar) {
+        o = hoverStar.constellation === e.constellations[0] ? Math.max(o, 0.3) : Math.min(o, 0.12);
+      }
+    } else {
+      // Relationships across constellations: hidden until relevant, and never
+      // drawn toward a star that's off screen.
+      const visible = onscreen === null || onscreen.has(e.id);
+      o = 0;
+      if (visible) {
+        if (touchesHover) o = 0.9;
+        else if (view.kind === "star" && touchesActive) o = 0.8;
+        else if (view.kind === "constellation" && touchesFocus && !hover) o = 0.22;
+      }
+      if (e.kind === "association") o *= 0.75;
+      active = o > 0.5;
     }
-    edge.set(e.id, { o, active: touchesActive && e.kind !== "shape" });
+    edge.set(e.id, { o, active });
   }
 
   const assocOfActive = new Set(

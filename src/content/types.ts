@@ -73,6 +73,7 @@ export interface Star {
   media: StarMedia | null;
   /** Position relative to the constellation's center, in world units. */
   position: Vec;
+  /** Optional override. By default the label goes wherever lines aren't. */
   labelSide?: LabelSide;
 }
 
@@ -99,11 +100,12 @@ export interface Constellation {
     portrait: ConstellationPlacement;
   };
   /**
-   * Faint lines that give the constellation its shape. Each inner array is a
-   * path of star ids. Membership is itself a relationship, so these only ever
-   * join stars of the same constellation.
+   * Structural lines that give the constellation its figure: pairs of star
+   * ids, both in this constellation. Branching is fine and not every star has
+   * to be joined — draw only the lines that make a pleasing, readable shape.
+   * Pairs that are also listed in `connections` light up as relationships.
    */
-  shape: string[][];
+  shape: [string, string][];
 }
 
 /**

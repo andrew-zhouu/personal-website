@@ -13,12 +13,13 @@ import {
   type Viewport,
 } from "@/lib/camera";
 import { computeEmphasis, type Hover } from "@/lib/emphasis";
+import { linkVisibility } from "@/lib/links";
 import { buildUniverse, type Universe } from "@/lib/universe";
 import { CameraContext, CameraEngine } from "./camera-engine";
 import { ConstellationCaption, Legend, MobileProfileBar, OverviewHint, TopBar } from "./Chrome";
 import { AboutPanel, StarPanel } from "./DetailPanel";
 import { IndexView } from "./IndexView";
-import { ConstellationLabel, HubNode, StarNode, type Level } from "./Overlay";
+import { ConstellationLabel, HubNode, SignpostNode, StarNode, type Level } from "./Overlay";
 import { SkyCanvas } from "./SkyCanvas";
 
 /* ─── Routing: the view lives in the URL hash so links and Back work ──── */
@@ -55,7 +56,15 @@ export default function UniverseApp() {
 
   const [vp, setVp] = useState<Viewport | null>(null);
   const [view, setView] = useState<View>({ kind: "overview" });
-  const [hover, setHover] = useState<Hover>(null);
+  const [hover, setHoverNow] = useState<Hover>(null);
+  // Clearing hover waits a beat, so the pointer can travel from a star to its
+  // signpost (or between neighbours) without everything flickering.
+  const hoverTimer = useRef<number | undefined>(undefined);
+  const setHover = useCallback((h: Hover) => {
+    window.clearTimeout(hoverTimer.current);
+    if (h) setHoverNow(h);
+    else hoverTimer.current = window.setTimeout(() => setHoverNow(null), 200);
+  }, []);
   const [indexOpen, setIndexOpen] = useState(false);
   const [explored, setExplored] = useState(false);
 
@@ -77,7 +86,7 @@ export default function UniverseApp() {
 
   const navigate = useCallback((v: View) => {
     setIndexOpen(false);
-    setHover(null);
+    setHoverNow(null);
     setExplored(true);
     setView((cur) => (viewKey(cur) === viewKey(v) ? cur : v));
     const hash = toHash(v);
@@ -88,7 +97,7 @@ export default function UniverseApp() {
 
   useEffect(() => {
     const onPop = () => {
-      setHover(null);
+      setHoverNow(null);
       setView(parseHash(window.location.hash, universe));
     };
     window.addEventListener("popstate", onPop);
@@ -148,9 +157,22 @@ export default function UniverseApp() {
   }, [indexOpen]);
 
   const level: Level = view.kind;
+  const links = useMemo(
+    () => (vp ? linkVisibility(universe, view, vp) : { onscreen: null, signposts: [] }),
+    [universe, view, vp],
+  );
+  // Zoomed into a constellation, signposts appear only for the star you're
+  // pointing at; in a star view they're always shown for that star.
+  const signposts = useMemo(
+    () =>
+      view.kind === "constellation"
+        ? links.signposts.filter((p) => hover?.kind === "star" && hover.id === p.source)
+        : links.signposts,
+    [links, view, hover],
+  );
   const emphasis = useMemo(
-    () => computeEmphasis(universe, view, hover, compact),
-    [universe, view, hover, compact],
+    () => computeEmphasis(universe, view, hover, links.onscreen),
+    [universe, view, hover, links],
   );
   const selectedId = view.kind === "star" ? view.id : null;
   const focusC: ConstellationId | null =
@@ -177,6 +199,7 @@ export default function UniverseApp() {
         className="universe"
         data-level={level}
         data-compact={compact || undefined}
+        data-layout={layout}
         data-ready={vp ? true : undefined}
       >
         <div className="absolute inset-0" inert={indexOpen}>
@@ -194,6 +217,7 @@ export default function UniverseApp() {
               <SkyCanvas
                 universe={universe}
                 emphasis={emphasis}
+                signposts={signposts}
                 selectedId={selectedId}
                 regionsActive={regionsActive}
                 onRegion={selectConstellation}
@@ -212,23 +236,34 @@ export default function UniverseApp() {
                   onHome={goHome}
                   onAbout={goAbout}
                 />
-                {universe.constellations.map((c, i) => (
+                {universe.constellations.map((c) => (
                   <ConstellationLabel
                     key={c.id}
                     c={c}
-                    index={i}
                     emphasis={emphasis.constellation.get(c.id)!}
                     onSelect={selectConstellation}
                     onHover={setHover}
                   />
+                ))}
+                {signposts.map((p) => (
+                  <SignpostNode key={p.id} p={p} onNavigate={navigate} onHover={setHover} />
                 ))}
                 {universe.stars.map((s) => {
                   const inFocus = focusC === s.constellation;
                   const em = emphasis.star.get(s.id)!;
                   // Compact overview: only featured labels, and stars aren't
                   // individually tappable (the constellation is the target).
+                  // The selected star is titled by the panel and breadcrumb; its
+                  // map label would only crowd its signposts.
+                  // The tall layout packs constellations closer, so (like phones)
+                  // it labels only featured stars until you zoom in.
+                  const roomy = !compact && layout === "landscape";
                   const showLabel =
-                    level === "overview" ? !compact || !!s.featured : inFocus || em.flag !== "none" || !compact;
+                    s.id === selectedId
+                      ? false
+                      : level === "overview"
+                        ? roomy || !!s.featured
+                        : inFocus || em.flag !== "none" || roomy;
                   return (
                     <StarNode
                       key={s.id}

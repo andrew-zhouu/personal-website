@@ -49,12 +49,19 @@ export interface ResolvedConstellation extends Constellation {
 
 export interface Edge {
   id: string;
-  kind: "relation" | "shape" | "association";
+  /**
+   * - `shape`: structural line inside a constellation (solid, always faintly
+   *   visible). `related` marks pairs that are also explicit connections.
+   * - `relation`: explicit connection between stars of different
+   *   constellations (dashed, hidden until a relevant star is in play).
+   * - `association`: a star's secondary constellation (dotted, likewise).
+   */
+  kind: "shape" | "relation" | "association";
   /** Star ids. For associations `b` is a constellation id. */
   a: string;
   b: string;
   d: string;
-  cross: boolean;
+  related: boolean;
   from: Vec;
   to: Vec;
   colorA: string;
@@ -170,6 +177,36 @@ function edgePath(p0: Vec, p1: Vec, hub: { rx: number; ry: number }, bend: numbe
   return `M${fmt(p0.x)} ${fmt(p0.y)}Q${fmt(ctrl.x)} ${fmt(ctrl.y)} ${fmt(p1.x)} ${fmt(p1.y)}`;
 }
 
+/**
+ * Put each label where no structural line leaves the star. Prefers below,
+ * then above, then the sides; picks the clearest side if none is fully clear.
+ */
+function chooseLabelSide(dirs: Vec[]): LabelSide {
+  const sides: [LabelSide, number][] = [
+    ["below", Math.PI / 2],
+    ["above", -Math.PI / 2],
+    ["right", 0],
+    ["left", Math.PI],
+  ];
+  const angles = dirs.map((d) => Math.atan2(d.y, d.x));
+  const clearance = (a: number) =>
+    angles.reduce((m, b) => {
+      const diff = Math.abs(((a - b + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
+      return Math.min(m, diff);
+    }, Math.PI);
+  let best: LabelSide = "below";
+  let bestScore = -1;
+  for (const [side, a] of sides) {
+    const c = clearance(a);
+    if (c >= (Math.PI / 180) * 62) return side;
+    if (c > bestScore) {
+      bestScore = c;
+      best = side;
+    }
+  }
+  return best;
+}
+
 const cache = new Map<Layout, Universe>();
 
 export function buildUniverse(layout: Layout): Universe {
@@ -200,13 +237,26 @@ export function buildUniverse(layout: Layout): Universe {
   });
   const starById = new Map(resolvedStars.map((s) => [s.id, s]));
 
+  // Auto-place labels away from this star's structural lines.
+  for (const s of resolvedStars) {
+    if (stars.find((x) => x.id === s.id)!.labelSide) continue;
+    const c = cById.get(s.constellation)!;
+    const dirs = c.shape
+      .filter(([a, b]) => a === s.id || b === s.id)
+      .map(([a, b]) => {
+        const other = starById.get(a === s.id ? b : a)!;
+        return { x: other.pos.x - s.pos.x, y: other.pos.y - s.pos.y };
+      });
+    s.labelSide = chooseLabelSide(dirs);
+  }
+
   const resolvedConstellations: ResolvedConstellation[] = constellations.map((c) => {
     const place = c.layouts[layout];
     const k = place.scale ?? 1;
     const members = resolvedStars.filter((s) => s.constellation === c.id);
     const labelPos = { x: place.center.x + place.label.x * k, y: place.center.y + place.label.y * k };
     // Pad for star labels (≈ 90 units either side, below the star).
-    const starBox = pad(boundsOf(members.map((s) => s.pos)), 110, 40);
+    const starBox = pad(boundsOf(members.map((s) => s.pos)), 130, 40);
     starBox.maxY += 40;
     const labelBox = pad(boundsOf([labelPos]), 120, 40);
     return {
@@ -221,21 +271,48 @@ export function buildUniverse(layout: Layout): Universe {
   const constellationById = new Map(resolvedConstellations.map((c) => [c.id, c]));
 
   const edges: Edge[] = [];
-  const seen = new Set<string>();
   const key = (a: string, b: string) => [a, b].sort().join("|");
+  const connectionKeys = new Set(connections.map((c) => key(c.a, c.b)));
+  const shapeKeys = new Set<string>();
 
+  for (const c of constellations) {
+    for (const [ia, ib] of c.shape) {
+      const k = key(ia, ib);
+      if (shapeKeys.has(k)) continue;
+      shapeKeys.add(k);
+      const a = starById.get(ia)!;
+      const b = starById.get(ib)!;
+      edges.push({
+        id: `shape:${k}`,
+        kind: "shape",
+        a: a.id,
+        b: b.id,
+        d: `M${fmt(a.pos.x)} ${fmt(a.pos.y)}L${fmt(b.pos.x)} ${fmt(b.pos.y)}`,
+        related: connectionKeys.has(k),
+        from: a.pos,
+        to: b.pos,
+        colorA: a.color,
+        colorB: b.color,
+        constellations: [c.id],
+      });
+    }
+  }
+
+  // Connections not already drawn as structure (normally the cross-
+  // constellation ones) become dashed relationship lines.
   for (const c of connections) {
+    const k = key(c.a, c.b);
+    if (shapeKeys.has(k)) continue;
     const a = starById.get(c.a)!;
     const b = starById.get(c.b)!;
     const cross = a.constellation !== b.constellation;
-    seen.add(key(a.id, b.id));
     edges.push({
-      id: `rel:${key(a.id, b.id)}`,
+      id: `rel:${k}`,
       kind: "relation",
       a: a.id,
       b: b.id,
-      d: edgePath(a.pos, b.pos, hub, cross ? 0.07 : 0.03),
-      cross,
+      d: edgePath(a.pos, b.pos, hub, cross ? 0.06 : 0.03),
+      related: true,
       from: a.pos,
       to: b.pos,
       colorA: a.color,
@@ -244,43 +321,18 @@ export function buildUniverse(layout: Layout): Universe {
     });
   }
 
-  for (const c of constellations) {
-    for (const path of c.shape) {
-      for (let i = 0; i < path.length - 1; i++) {
-        const k = key(path[i], path[i + 1]);
-        if (seen.has(k)) continue;
-        seen.add(k);
-        const a = starById.get(path[i])!;
-        const b = starById.get(path[i + 1])!;
-        edges.push({
-          id: `shape:${k}`,
-          kind: "shape",
-          a: a.id,
-          b: b.id,
-          d: `M${fmt(a.pos.x)} ${fmt(a.pos.y)}L${fmt(b.pos.x)} ${fmt(b.pos.y)}`,
-          cross: false,
-          from: a.pos,
-          to: b.pos,
-          colorA: a.color,
-          colorB: b.color,
-          constellations: [c.id],
-        });
-      }
-    }
-  }
-
   for (const s of resolvedStars) {
     for (const cid of s.secondary ?? []) {
       const target = constellationById.get(cid)!;
       // End just short of the label so the line points *at* the constellation.
-      const to = { x: target.labelPos.x, y: target.labelPos.y - 18 };
+      const to = { x: target.labelPos.x, y: target.labelPos.y - 22 };
       edges.push({
         id: `assoc:${s.id}|${cid}`,
         kind: "association",
         a: s.id,
         b: cid,
-        d: edgePath(s.pos, to, hub, 0.08),
-        cross: true,
+        d: edgePath(s.pos, to, hub, 0.06),
+        related: true,
         from: s.pos,
         to,
         colorA: s.color,

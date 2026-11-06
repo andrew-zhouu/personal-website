@@ -34,10 +34,10 @@ function PanelShell({ vp, accent, reduced, labelledBy, children }: ShellProps) {
           aria-hidden="true"
           className="pointer-events-none absolute h-px origin-left"
           style={{
-            left: g.focus.x + 30,
+            left: g.focus.x + 32,
             top: g.focus.y,
-            width: Math.max(0, g.left - g.focus.x - 30),
-            background: `linear-gradient(90deg, ${accent}cc, ${accent}22)`,
+            width: Math.max(0, g.left - g.focus.x - 32),
+            background: `linear-gradient(90deg, ${accent}dd, ${accent}33)`,
           }}
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1, transition: { delay: delay + 0.15, duration: reduced ? 0 : 0.5, ease: EASE_OUT } }}
@@ -49,9 +49,9 @@ function PanelShell({ vp, accent, reduced, labelledBy, children }: ShellProps) {
           className="pointer-events-none absolute w-px origin-top"
           style={{
             left: g.focus.x,
-            top: g.focus.y + 28,
-            height: Math.max(0, g.top - g.focus.y - 28),
-            background: `linear-gradient(180deg, ${accent}cc, ${accent}22)`,
+            top: g.focus.y + 30,
+            height: Math.max(0, g.top - g.focus.y - 30),
+            background: `linear-gradient(180deg, ${accent}dd, ${accent}33)`,
           }}
           initial={{ scaleY: 0, opacity: 0 }}
           animate={{ scaleY: 1, opacity: 1, transition: { delay: delay + 0.15, duration: reduced ? 0 : 0.45, ease: EASE_OUT } }}
@@ -65,7 +65,7 @@ function PanelShell({ vp, accent, reduced, labelledBy, children }: ShellProps) {
         data-mode={g.mode}
         style={
           side
-            ? { left: g.left, top: g.top, width: g.width, maxHeight: vp.h - g.top - 40, transformOrigin: "left center", "--accent": accent } as React.CSSProperties
+            ? { left: g.left, top: g.top, width: g.width, maxHeight: vp.h - g.top - 24, transformOrigin: "left center", "--accent": accent } as React.CSSProperties
             : { left: g.left, top: g.top, width: g.width, bottom: 0, transformOrigin: "center top", "--accent": accent } as React.CSSProperties
         }
         initial={reduced ? { opacity: 0 } : side ? { opacity: 0, x: -28, scale: 0.98 } : { opacity: 0, y: 36 }}
@@ -117,17 +117,29 @@ function LinkRow({ link }: { link: StarLink }) {
         <a href={link.href} target="_blank" rel="noopener noreferrer" className="text-link">
           {link.label} <span aria-hidden="true">↗</span>
         </a>
-        <span className="link-status" data-s="live">Live</span>
+        <span className="link-status" data-s="live">
+          Live
+        </span>
       </li>
     );
   }
   return (
     <li className="link-row">
-      <span className="text-ink-2">{link.label}</span>
+      <span className="text-ink-1">{link.label}</span>
       <span className="link-status" data-s={link.status}>
         {link.status === "unverified" ? "Not yet verified" : "Coming soon"}
       </span>
     </li>
+  );
+}
+
+function CloseButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button type="button" className="btn-icon" onClick={onClick} aria-label={label} title={label}>
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+        <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    </button>
   );
 }
 
@@ -156,24 +168,30 @@ export function StarPanel({
   const c = universe.constellationById.get(star.constellation)!;
   const headingRef = useFocusOnMount<HTMLHeadingElement>();
   const live = star.links.filter((l) => l.status === "live" && l.href);
+  const otherLinks = star.links.filter((l) => !(l.status === "live" && l.href));
   const headingId = `panel-title-${star.id}`;
+  const back = () => onNavigate({ kind: "constellation", id: c.id });
 
   return (
     <PanelShell vp={vp} accent={star.color} reduced={reduced} labelledBy={headingId}>
-      <header className="panel-header">
-        <p className="eyebrow">
-          <span className="dot" style={{ background: star.color }} aria-hidden="true" />
-          <span style={{ color: star.color }}>{c.name}</span>
-          <span className="eyebrow-sep" aria-hidden="true">/</span>
-          <span>{statusText(star)}</span>
-        </p>
+      <header>
+        <div className="panel-top">
+          <p className="kicker">
+            <span className="dot" style={{ background: star.color }} aria-hidden="true" />
+            <span style={{ color: star.color }}>{c.name}</span>
+            <span className="status-chip" data-b={star.brightness}>
+              {statusText(star)}
+            </span>
+          </p>
+          <CloseButton label={`Close and return to ${c.name}`} onClick={back} />
+        </div>
         <h2 id={headingId} ref={headingRef} tabIndex={-1} className="panel-title">
           {star.title}
         </h2>
         {star.subtitle && <p className="panel-subtitle">{star.subtitle}</p>}
         <p className="panel-lead">{star.summary}</p>
         {live.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="panel-actions">
             {live.map((l) => (
               <a key={l.href} href={l.href!} target="_blank" rel="noopener noreferrer" className="btn-primary">
                 Visit {l.label}
@@ -183,6 +201,16 @@ export function StarPanel({
           </div>
         )}
       </header>
+
+      {star.results.length > 0 && (
+        <Section title="Results">
+          <ul className="results">
+            {star.results.map((x, i) => (
+              <li key={i}>{x}</li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       {star.media && <Media media={star.media} accent={star.color} />}
 
@@ -210,20 +238,10 @@ export function StarPanel({
         )}
       </Section>
 
-      {star.results.length > 0 && (
-        <Section title="Results">
-          <ul className="panel-list">
-            {star.results.map((x, i) => (
-              <li key={i}>{x}</li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {star.links.length > 0 && (
+      {otherLinks.length > 0 && (
         <Section title="Links">
-          <ul className="space-y-2">
-            {star.links.map((l) => (
+          <ul>
+            {otherLinks.map((l) => (
               <LinkRow key={l.label} link={l} />
             ))}
           </ul>
@@ -231,7 +249,7 @@ export function StarPanel({
       )}
 
       {(star.related.length > 0 || (star.secondary?.length ?? 0) > 0) && (
-        <Section title="Connected to">
+        <Section title="Connected work">
           <ul className="related-list">
             {star.related.map((r) => {
               const other = universe.starById.get(r.id)!;
@@ -245,10 +263,11 @@ export function StarPanel({
                     onClick={() => onNavigate({ kind: "star", id: other.id })}
                   >
                     <span className="related-top">
-                      <span className="dot" style={{ background: other.color }} aria-hidden="true" />
                       <span className="related-title">{other.title}</span>
                       <span className="related-c">{oc.name}</span>
-                      <span className="related-arrow" aria-hidden="true">→</span>
+                      <span className="related-go">
+                        View <span aria-hidden="true">→</span>
+                      </span>
                     </span>
                     <span className="related-note">{r.note}</span>
                   </button>
@@ -266,9 +285,10 @@ export function StarPanel({
                     onClick={() => onNavigate({ kind: "constellation", id: cid })}
                   >
                     <span className="related-top">
-                      <span className="dot is-ring" style={{ borderColor: oc.color }} aria-hidden="true" />
                       <span className="related-title">Also part of {oc.name}</span>
-                      <span className="related-arrow" aria-hidden="true">→</span>
+                      <span className="related-go">
+                        Explore <span aria-hidden="true">→</span>
+                      </span>
                     </span>
                     <span className="related-note">{oc.description}</span>
                   </button>
@@ -280,7 +300,7 @@ export function StarPanel({
       )}
 
       <footer className="panel-footer">
-        <button type="button" className="btn-quiet focus-ring" onClick={() => onNavigate({ kind: "constellation", id: c.id })}>
+        <button type="button" className="btn-secondary" onClick={back}>
           <span aria-hidden="true">←</span> Back to {c.name}
         </button>
         <button type="button" className="btn-quiet focus-ring" onClick={() => onNavigate({ kind: "overview" })}>
@@ -303,13 +323,17 @@ export function AboutPanel({
   onNavigate: (v: View) => void;
 }) {
   const headingRef = useFocusOnMount<HTMLHeadingElement>();
+  const home = () => onNavigate({ kind: "overview" });
   return (
     <PanelShell vp={vp} accent="#c9d5ff" reduced={reduced} labelledBy="panel-title-about">
-      <header className="panel-header">
-        <p className="eyebrow">
-          <span className="dot" style={{ background: "#dfe6ff" }} aria-hidden="true" />
-          <span>About</span>
-        </p>
+      <header>
+        <div className="panel-top">
+          <p className="kicker">
+            <span className="dot" style={{ background: "#dfe6ff" }} aria-hidden="true" />
+            About
+          </p>
+          <CloseButton label="Close and return to the map" onClick={home} />
+        </div>
         <h2 id="panel-title-about" ref={headingRef} tabIndex={-1} className="panel-title">
           {profile.name}
         </h2>
@@ -325,14 +349,9 @@ export function AboutPanel({
         <Placeholder>{profile.about.placeholder}</Placeholder>
       </Section>
       <Section title="Elsewhere">
-        <ProfileLinks
-          onAbout={() => {}}
-          exclude={["about"]}
-          className="flex flex-wrap gap-x-5 gap-y-2"
-          itemClassName="text-[15px]"
-        />
+        <ProfileLinks onAbout={() => {}} exclude={["about"]} className="-ml-2.5 flex flex-wrap gap-1" />
         {profile.links.some((l) => l.kind === "external" && !l.href) && (
-          <p className="mt-3 text-[13px] text-ink-3">Dimmed links are coming soon.</p>
+          <p className="mt-2 text-[13.5px] text-ink-3">Dimmed links are coming soon.</p>
         )}
       </Section>
       <Section title="Explore">
@@ -346,10 +365,11 @@ export function AboutPanel({
                 onClick={() => onNavigate({ kind: "constellation", id: c.id })}
               >
                 <span className="related-top">
-                  <span className="dot" style={{ background: c.color }} aria-hidden="true" />
                   <span className="related-title">{c.name}</span>
                   <span className="related-c">{c.starIds.length} stars</span>
-                  <span className="related-arrow" aria-hidden="true">→</span>
+                  <span className="related-go">
+                    Explore <span aria-hidden="true">→</span>
+                  </span>
                 </span>
                 <span className="related-note">{c.description}</span>
               </button>
@@ -358,7 +378,7 @@ export function AboutPanel({
         </ul>
       </Section>
       <footer className="panel-footer">
-        <button type="button" className="btn-quiet focus-ring" onClick={() => onNavigate({ kind: "overview" })}>
+        <button type="button" className="btn-secondary" onClick={home}>
           <span aria-hidden="true">←</span> Back to the map
         </button>
       </footer>

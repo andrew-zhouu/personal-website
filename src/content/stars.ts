@@ -45,8 +45,7 @@ export const stars: Star[] = [
     // Flip to "live" once the site is confirmed. The star brightens automatically.
     links: [{ label: "useactionplan.com", href: "https://useactionplan.com", status: "unverified" }],
     media: { kind: "screenshot", src: null, alt: "Screenshot of ActionPlan" },
-    position: { x: -70, y: -30 },
-    labelSide: "above",
+    position: { x: -70, y: -48 },
   },
   {
     id: "wshs-website",
@@ -128,7 +127,7 @@ export const stars: Star[] = [
     results: [],
     links: [],
     media: null,
-    position: { x: 80, y: 145 },
+    position: { x: 150, y: 95 },
   },
 
   // ─── SOLVE ────────────────────────────────────────────────────────────────

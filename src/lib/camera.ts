@@ -47,7 +47,7 @@ function focusOn(x: number, y: number, focus: { x: number; y: number }, s: numbe
 
 export function overviewCam(u: Universe, vp: Viewport): Cam {
   const insets = isCompact(vp)
-    ? { top: 64, right: 12, bottom: 84, left: 12 }
+    ? { top: 64, right: 12, bottom: 118, left: 12 }
     : { top: 76, right: 56, bottom: 76, left: 56 };
   return fit(u.bounds, vp, insets, 1.25);
 }
@@ -63,7 +63,7 @@ export function constellationCam(u: Universe, id: ConstellationId, vp: Viewport)
   const cap = captionGeometry(vp);
   const insets =
     cap.mode === "bottom"
-      ? { top: 84, right: 20, bottom: cap.height + 24, left: 20 }
+      ? { top: 84, right: 76, bottom: cap.height + 24, left: 76 }
       : { top: 100, right: 72, bottom: 100, left: cap.width + 96 };
   const base = overviewCam(u, vp).s;
   return fit(isCompact(vp) ? c.starBounds : c.bounds, vp, insets, Math.min(base * 2.6, 1.7));
@@ -108,6 +108,21 @@ export function aboutCam(u: Universe, vp: Viewport): Cam {
   const availH = p.mode === "side" ? vp.h - 160 : p.top - 70;
   const s = Math.min(avail / (u.hub.rx * 2.1), availH / (u.hub.ry * 2.1), 1.4);
   return focusOn(0, 0, p.focus, s, vp);
+}
+
+/** Screen area not covered by chrome, captions or the detail panel. */
+export function visibleRect(view: View, vp: Viewport) {
+  const r = { left: 12, top: 68, right: vp.w - 12, bottom: vp.h - 12 };
+  if (view.kind === "constellation") {
+    const cap = captionGeometry(vp);
+    if (cap.mode === "side") r.left = cap.width + 72;
+    else r.bottom = vp.h - cap.height - 8;
+  } else if (view.kind === "star" || view.kind === "about") {
+    const p = panelGeometry(vp);
+    if (p.mode === "side") r.right = p.left - 16;
+    else r.bottom = p.top - 8;
+  }
+  return r;
 }
 
 export function camFor(view: View, u: Universe, vp: Viewport): Cam {

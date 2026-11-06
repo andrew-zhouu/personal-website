@@ -8,15 +8,13 @@ export const HUB_BOX = { w: 560, h: 340 };
 
 /**
  * Irregular ring of small stars around the name. Hand-placed so the shape is
- * organic but intentional; the gap between the 4th and 5th points keeps it
- * reading as a loose constellation rather than a closed frame.
+ * organic but intentional — a closed, slightly irregular enclosure.
  */
 export const HUB_RING: { x: number; y: number; r: number }[] = [
   { x: -214, y: -112, r: 2.2 },
   { x: -112, y: -146, r: 1.6 },
   { x: -18, y: -134, r: 2.6 },
   { x: 96, y: -150, r: 1.7 },
-  // gap
   { x: 206, y: -108, r: 2.1 },
   { x: 262, y: -18, r: 1.6 },
   { x: 236, y: 82, r: 2.4 },
@@ -27,8 +25,6 @@ export const HUB_RING: { x: number; y: number; r: number }[] = [
   { x: -264, y: 18, r: 1.6 },
   { x: -252, y: -58, r: 1.9 },
 ];
-/** Index after which the ring is left open. */
-export const HUB_RING_GAP_AFTER = 3;
 
 function mulberry32(seed: number) {
   return () => {

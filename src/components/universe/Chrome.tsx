@@ -47,7 +47,7 @@ export function TopBar({
           {view.kind !== "overview" && (
             <motion.ol key="crumbs" {...fade} className="crumbs">
               <li>
-                <button type="button" className="crumb-back focus-ring" onClick={onBack} aria-label="Go back one level">
+                <button type="button" className="btn-icon" onClick={onBack} aria-label="Go back one level">
                   <span aria-hidden="true">←</span>
                 </button>
               </li>
@@ -84,10 +84,10 @@ export function TopBar({
         </AnimatePresence>
       </nav>
       <button type="button" onClick={onOpenIndex} className="btn-chrome pointer-events-auto focus-ring" data-index-trigger>
-        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-          <path d="M1 3h12M1 7h12M1 11h8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <svg width="15" height="15" viewBox="0 0 14 14" aria-hidden="true">
+          <path d="M1 3h12M1 7h12M1 11h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
-        View all
+        View all<span className="max-sm:hidden"> work</span>
       </button>
     </header>
   );
@@ -185,14 +185,8 @@ export function ConstellationCaption({
       animate={{ opacity: 1, x: 0, y: 0, transition: { duration: 0.5, delay: 0.35, ease: [0.2, 0.7, 0.2, 1] } }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
     >
-      <p className="eyebrow">
-        <span style={{ color: c.color }}>{String(i + 1).padStart(2, "0")}</span>
-        <span className="eyebrow-sep" aria-hidden="true">/</span>
-        <span>04</span>
-        <span className="eyebrow-sep" aria-hidden="true">·</span>
-        <span>
-          {members.length} stars{live ? `, ${live} live` : ""}
-        </span>
+      <p className="kicker">
+        Constellation {i + 1} of {list.length} · {members.length} stars{live ? `, ${live} live` : ""}
       </p>
       <h2 className="caption-title" style={{ color: c.color }}>
         {c.name}
@@ -222,7 +216,7 @@ export function ConstellationCaption({
       )}
 
       <div className="caption-nav">
-        <button type="button" className="btn-quiet focus-ring" onClick={() => onNavigate({ kind: "overview" })}>
+        <button type="button" className="btn-secondary" onClick={() => onNavigate({ kind: "overview" })}>
           <span aria-hidden="true">←</span> Overview
         </button>
         <span className="flex-1" />

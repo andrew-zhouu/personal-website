@@ -40,8 +40,8 @@ function validate() {
       problems.push(`Connection ${c.a} ↔ ${c.b} references an unknown star`);
   }
   for (const c of constellations) {
-    for (const path of c.shape) {
-      for (const id of path) {
+    for (const pair of c.shape) {
+      for (const id of pair) {
         const s = stars.find((x) => x.id === id);
         if (!s || s.constellation !== c.id)
           problems.push(`Constellation "${c.id}" shape references "${id}" outside it`);
